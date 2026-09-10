@@ -74,10 +74,48 @@ def insert_movie(session, title, year, director, genre, rating):
 
 
 def query_by_title(session, title, year):
-    pass  
+    if year == 0:
+
+        SELECT_BY_TITLE = """
+        SELECT * 
+        FROM movies_by_title 
+        WHERE title = ?;
+        """
+
+        query = session.prepare(SELECT_BY_TITLE)
+        rows = session.execute(query, (title, )) 
+
+        for row in rows:
+            print(row)
+    else:
+        SELECT_BY_TITLE = """
+        SELECT * 
+        FROM movies_by_title 
+        WHERE title = ? AND release_year = ?;
+        """
+
+        query = session.prepare(SELECT_BY_TITLE)
+        rows = session.execute(query, (title, year)) 
+
+        for row in rows:
+            print(row)
+
 
 def query_by_genre(session, genre):
-    pass  
+
+    SELECT_BY_GENRE = """
+    SELECT *
+    FROM movies_by_genre
+    WHERE genre = ?
+    ORDER BY rating DESC;
+    """
+
+    query = session.prepare(SELECT_BY_GENRE)
+    rows = session.execute(query, (genre, ))
+
+    for row in rows:
+        print(row)
+
 
 def update_movie_director(session, title, genre, new_director):
     pass  
@@ -111,8 +149,11 @@ def main():
             insert_movie(session, title, year, director, genre, rating)
         elif choice == "2":
             title = input("Título: ")
-            year = int(input("Año: "))
-            query_by_title(session, title, year)
+            year = input("Año (presiona enter si no sabes el año): ")
+            if year == "":
+                query_by_title(session, title, 0)
+            else:
+                query_by_title(session, title, int(year))
         elif choice == "3":
             genre = input("Género: ")
             query_by_genre(session, genre)
