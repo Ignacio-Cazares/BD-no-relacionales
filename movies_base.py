@@ -153,7 +153,25 @@ def update_movie_director(session, title, genre, new_director):
 
 
 def delete_movie(session, title, genre, rating, release_year):
-    pass
+    DELETE_MOVIE = """
+    DELETE FROM movies_by_title
+    WHERE title = ? AND release_year = ?;
+    """
+
+    query = session.prepare(DELETE_MOVIE)
+    session.execute(query, (title, release_year))
+
+    DELETE_MOVIE2 = """
+    DELETE FROM movies_by_genre
+    WHERE genre = ? AND rating = ?;
+    """
+
+    query = session.prepare(DELETE_MOVIE2)
+    session.execute(query, (genre, rating))
+
+    print("Pelicula eliminada con exito de ambas tablas")
+
+
 # ==============================
 # Menú
 # ==============================
@@ -169,6 +187,7 @@ def main():
         print("2. Consultar por título")
         print("3. Consultar por género")
         print("4. Actualizar director")
+        print("5. Eliminar una pelicula")
         print("0. Salir")
         choice = input("Seleccione opción: ")
 
@@ -199,12 +218,14 @@ def main():
             # Eliminar de movie_by_genre -> genre, rating
             title = input("Título: ")
             genre = input("Género: ")
-            rating = input("Rating: ")
-            release_year = input("Año: ")
+            rating = float(input("Rating: "))
+            release_year = int(input("Año: "))
             delete_movie(session, title, genre, rating, release_year)
         elif choice == '0':
-            # Cerrar conexión y salir
-            pass
+            print("Cerrando conexion...")
+            session.shutdown()
+            cluster.shutdown()
+            break
         else:
             print("Opción inválida")
             break
