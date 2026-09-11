@@ -118,7 +118,39 @@ def query_by_genre(session, genre):
 
 
 def update_movie_director(session, title, genre, new_director):
-    pass  
+
+    SELECT_MOVIE = """
+    SELECT *
+    FROM movies_by_title
+    WHERE title = ?;
+    """
+
+    query = session.prepare(SELECT_MOVIE)
+    rows = session.execute(query, (title, ))
+
+    for row in rows:
+        year = row.release_year
+        rating = row.rating 
+
+    UPDATE_MOVIE = """
+    UPDATE movies_by_title
+    SET director = ?
+    WHERE title = ? AND release_year = ?;
+    """
+
+    query = session.prepare(UPDATE_MOVIE)
+    session.execute(query, (new_director, title, year))
+
+    UPDATE_MOVIE2 = """
+    UPDATE movies_by_genre
+    SET director = ?
+    WHERE genre = ? AND rating = ?
+    """
+
+    query = session.prepare(UPDATE_MOVIE2)
+    session.execute(query, (new_director, genre, rating))
+    print("Director actualizado en ambas tablas")
+
 
 def delete_movie(session, title, genre, rating, release_year):
     pass
